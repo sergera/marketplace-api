@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS orders (
 	price INT NOT NULL,
 	status CITEXT NOT NULL,
 	date_created TIMESTAMP NOT NULL,
-	CONSTRAINT order_status_length CHECK (LENGTH(address) <= 11)
+	CONSTRAINT order_status_length CHECK (LENGTH(status) <= 11)
 );
 
 CREATE INDEX order_status ON orders(status);
