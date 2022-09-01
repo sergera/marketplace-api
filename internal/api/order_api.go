@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/sergera/marketplace-api/internal/conf"
 	"github.com/sergera/marketplace-api/internal/domain"
@@ -37,6 +38,8 @@ func (o *OrderAPI) CreateOrder(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+
+	m.Date = time.Now()
 
 	if err := o.orderRepo.CreateOrder(&m); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)

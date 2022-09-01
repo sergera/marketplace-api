@@ -18,7 +18,7 @@ func NewOrderRepository(conn *DBConnection) *OrderRepository {
 func (o *OrderRepository) CreateOrder(m *domain.OrderModel) error {
 	if err := o.conn.Session.QueryRow(
 		`
-		INSERT INTO orders (price, status, date)
+		INSERT INTO orders (price, status, date_created)
 		VALUES ($1, $2, $3)
 		RETURNING id
 		`,
@@ -40,7 +40,7 @@ func (o *OrderRepository) GetOrderRange(m domain.OrderRangeModel) ([]domain.Orde
 	if m.OldestFirst {
 		rows, err = tx.Query(
 			`
-			SELECT id, price, status, date
+			SELECT id, price, status, date_created
 			FROM orders
 			AND id >= $1
 			AND id <= $2
@@ -85,7 +85,7 @@ func (o *OrderRepository) GetOrderRange(m domain.OrderRangeModel) ([]domain.Orde
 
 		rows, err = tx.Query(
 			`
-			SELECT id, price, status, date
+			SELECT id, price, status, date_created
 			FROM orders
 			AND id >= $1
 			AND id <= $2
