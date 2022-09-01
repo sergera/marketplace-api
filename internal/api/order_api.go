@@ -107,7 +107,7 @@ func CorsHandler(h http.HandlerFunc) http.HandlerFunc {
 		if r.Method == "OPTIONS" {
 			//handle preflight in here
 			w.Header().Add("Access-Control-Allow-Headers", "Content-Type, Accept")
-			w.Header().Add("Access-Control-Allow-Methods", "GET, OPTIONS")
+			w.Header().Add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		} else {
 			h.ServeHTTP(w, r)
 		}
