@@ -42,8 +42,7 @@ func (o *OrderRepository) GetOrderRange(m domain.OrderRangeModel) ([]domain.Orde
 			`
 			SELECT id, price, status, date_created
 			FROM orders
-			AND id >= $1
-			AND id <= $2
+			WHERE id >= $1 AND id <= $2
 			ORDER BY id ASC
 			`,
 			m.Start, m.End,
@@ -87,8 +86,7 @@ func (o *OrderRepository) GetOrderRange(m domain.OrderRangeModel) ([]domain.Orde
 			`
 			SELECT id, price, status, date_created
 			FROM orders
-			AND id >= $1
-			AND id <= $2
+			WHERE id >= $1 AND id <= $2
 			ORDER BY id DESC
 			`,
 			maxId-(end-1), maxId-(start-1),
