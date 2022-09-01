@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"strconv"
 
-	"github.com/sergera/kafka-test/orders-backend/internal/domain"
+	"github.com/sergera/marketplace-api/internal/domain"
 )
 
 type OrderRepository struct {

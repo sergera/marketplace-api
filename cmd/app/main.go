@@ -5,8 +5,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/sergera/kafka-test/orders-backend/internal/api"
-	"github.com/sergera/kafka-test/orders-backend/internal/conf"
+	"github.com/sergera/marketplace-api/internal/api"
+	"github.com/sergera/marketplace-api/internal/conf"
 )
 
 func init() {

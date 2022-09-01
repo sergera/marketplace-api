@@ -1,4 +1,4 @@
-module github.com/sergera/kafka-test/orders-backend
+module github.com/sergera/marketplace-api
 
 go 1.18
 

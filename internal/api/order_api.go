@@ -5,9 +5,10 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/sergera/kafka-test/orders-backend/internal/conf"
-	"github.com/sergera/kafka-test/orders-backend/internal/domain"
-	"github.com/sergera/kafka-test/orders-backend/internal/repositories"
+	"github.com/sergera/marketplace-api/internal/conf"
+	"github.com/sergera/marketplace-api/internal/domain"
+	"github.com/sergera/marketplace-api/internal/evt"
+	"github.com/sergera/marketplace-api/internal/repositories"
 )
 
 type OrderAPI struct {
