@@ -61,6 +61,28 @@ func (o *OrderAPI) CreateOrder(w http.ResponseWriter, r *http.Request) {
 	w.Write(orderInBytes)
 }
 
+func (o *OrderAPI) UpdateOrder(w http.ResponseWriter, r *http.Request) {
+	var m domain.OrderModel
+
+	if err := json.NewDecoder(r.Body).Decode(&m); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if err := m.Validate(); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if err := o.orderRepo.UpdateOrder(m); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+}
+
 func (o *OrderAPI) GetOrderRange(w http.ResponseWriter, r *http.Request) {
 	start := r.URL.Query().Get("start")
 	end := r.URL.Query().Get("end")

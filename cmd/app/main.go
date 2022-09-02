@@ -22,6 +22,7 @@ func main() {
 
 	mux.HandleFunc("/create", api.CorsHandler(orderAPI.CreateOrder))
 	mux.HandleFunc("/order-range", api.CorsHandler(orderAPI.GetOrderRange))
+	mux.HandleFunc("/update-order", orderAPI.UpdateOrder)
 
 	srv := &http.Server{
 		Addr:    ":" + conf.Port,

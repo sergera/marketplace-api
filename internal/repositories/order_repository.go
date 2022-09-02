@@ -30,6 +30,21 @@ func (o *OrderRepository) CreateOrder(m *domain.OrderModel) error {
 	return nil
 }
 
+func (o *OrderRepository) UpdateOrder(m domain.OrderModel) error {
+	if _, err := o.conn.Session.Exec(
+		`
+		UPDATE orders
+		SET status = $1
+		WHERE id = $2
+		`,
+		m.Status, m.Id,
+	); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (o *OrderRepository) GetOrderRange(m domain.OrderRangeModel) ([]domain.OrderModel, error) {
 	tx, err := o.conn.Session.Begin()
 	if err != nil {
