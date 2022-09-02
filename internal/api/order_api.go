@@ -13,8 +13,9 @@ import (
 )
 
 type OrderAPI struct {
-	conn      *repositories.DBConnection
-	orderRepo *repositories.OrderRepository
+	conn         *repositories.DBConnection
+	orderRepo    *repositories.OrderRepository
+	eventHandler *evt.EventHandler
 }
 
 func NewOrderAPI() *OrderAPI {
@@ -23,7 +24,8 @@ func NewOrderAPI() *OrderAPI {
 	conn := repositories.NewDBConnection(conf.DBHost, conf.DBPort, conf.DBName, conf.DBUser, conf.DBPassword, false)
 	conn.Open()
 	orderRepo := repositories.NewOrderRepository(conn)
-	return &OrderAPI{conn, orderRepo}
+	evtHandler := evt.NewEventHandler()
+	return &OrderAPI{conn, orderRepo, evtHandler}
 }
 
 func (o *OrderAPI) CreateOrder(w http.ResponseWriter, r *http.Request) {
@@ -51,6 +53,8 @@ func (o *OrderAPI) CreateOrder(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	o.eventHandler.Produce(evt.Topics[evt.Unconfirmed], "", orderInBytes)
 
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")

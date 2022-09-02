@@ -14,12 +14,14 @@ type conf struct {
 	hocon           *hocon.Config
 	Port            string
 	LogPath         string
+	CORSAllowedURLs string
 	DBHost          string
 	DBPort          string
 	DBName          string
 	DBUser          string
 	DBPassword      string
-	CORSAllowedURLs string
+	KafkaHost       string
+	KafkaPort       string
 }
 
 func GetConf() *conf {
@@ -40,6 +42,8 @@ func (c *conf) setup() {
 	c.setDBUser()
 	c.setDBPassword()
 	c.setCORSAllowedURLs()
+	c.setKafkaHost()
+	c.setKafkaPort()
 }
 
 func (c *conf) parseHOCONConfigFile() {
@@ -60,6 +64,15 @@ func (c *conf) setPort() {
 	}
 
 	c.Port = port
+}
+
+func (c *conf) setCORSAllowedURLs() {
+	corsAllowedURLs := c.hocon.GetString("cors.urls")
+	if len(corsAllowedURLs) == 0 {
+		log.Panic("cors allowed urls environment variable not found")
+	}
+
+	c.CORSAllowedURLs = corsAllowedURLs
 }
 
 func (c *conf) setDBHost() {
@@ -108,11 +121,20 @@ func (c *conf) setDBPassword() {
 	c.DBPassword = dbPassword
 }
 
-func (c *conf) setCORSAllowedURLs() {
-	corsAllowedURLs := c.hocon.GetString("cors.urls")
-	if len(corsAllowedURLs) == 0 {
-		log.Panic("cors allowed urls environment variable not found")
+func (c *conf) setKafkaHost() {
+	kafkaHost := c.hocon.GetString("kafka.host")
+	if len(kafkaHost) == 0 {
+		log.Panic("kafka host environment variable not found")
 	}
 
-	c.CORSAllowedURLs = corsAllowedURLs
+	c.KafkaHost = kafkaHost
+}
+
+func (c *conf) setKafkaPort() {
+	kafkaPort := c.hocon.GetString("kafka.port")
+	if len(kafkaPort) == 0 {
+		log.Panic("kafka port environment variable not found")
+	}
+
+	c.KafkaPort = kafkaPort
 }
