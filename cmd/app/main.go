@@ -7,6 +7,7 @@ import (
 
 	"github.com/sergera/marketplace-api/internal/api"
 	"github.com/sergera/marketplace-api/internal/conf"
+	"github.com/sergera/marketplace-api/internal/notifier"
 )
 
 func init() {
@@ -19,10 +20,12 @@ func main() {
 	mux := http.NewServeMux()
 
 	orderAPI := api.NewOrderAPI()
-
 	mux.HandleFunc("/create", api.CorsHandler(orderAPI.CreateOrder))
 	mux.HandleFunc("/order-range", api.CorsHandler(orderAPI.GetOrderRange))
 	mux.HandleFunc("/update-order", orderAPI.UpdateOrder)
+
+	orderNotifier := notifier.GetOrderNotifier()
+	mux.HandleFunc("/notify-orders", api.CorsHandler(orderNotifier.PushOrders))
 
 	srv := &http.Server{
 		Addr:    ":" + conf.Port,

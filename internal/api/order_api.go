@@ -9,6 +9,7 @@ import (
 	"github.com/sergera/marketplace-api/internal/conf"
 	"github.com/sergera/marketplace-api/internal/domain"
 	"github.com/sergera/marketplace-api/internal/evt"
+	"github.com/sergera/marketplace-api/internal/notifier"
 	"github.com/sergera/marketplace-api/internal/repositories"
 )
 
@@ -16,6 +17,7 @@ type OrderAPI struct {
 	conn         *repositories.DBConnection
 	orderRepo    *repositories.OrderRepository
 	eventHandler *evt.EventHandler
+	notifier     *notifier.OrderNotifier
 }
 
 func NewOrderAPI() *OrderAPI {
@@ -25,7 +27,8 @@ func NewOrderAPI() *OrderAPI {
 	conn.Open()
 	orderRepo := repositories.NewOrderRepository(conn)
 	evtHandler := evt.NewEventHandler()
-	return &OrderAPI{conn, orderRepo, evtHandler}
+	orderNotifier := notifier.GetOrderNotifier()
+	return &OrderAPI{conn, orderRepo, evtHandler, orderNotifier}
 }
 
 func (o *OrderAPI) CreateOrder(w http.ResponseWriter, r *http.Request) {
@@ -55,6 +58,7 @@ func (o *OrderAPI) CreateOrder(w http.ResponseWriter, r *http.Request) {
 	}
 
 	o.eventHandler.Produce(evt.Topics[domain.Unconfirmed], "", orderInBytes)
+	o.notifier.AppendOrder(m)
 
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
@@ -78,6 +82,8 @@ func (o *OrderAPI) UpdateOrder(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+
+	o.notifier.AppendOrder(m)
 
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
