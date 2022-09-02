@@ -28,34 +28,16 @@ func (s status) String() string {
 
 type OrderModel struct {
 	Id     string    `json:"id"`
-	Price  string    `json:"price"`
+	Price  uint64    `json:"price"`
 	Status string    `json:"status"`
 	Date   time.Time `json:"date"`
 }
 
 func (o OrderModel) Validate() error {
-	if err := o.ValidatePrice(); err != nil {
-		return err
-	}
 	if err := o.ValidateStatus(); err != nil {
 		return err
 	}
 	return nil
-}
-
-func (o OrderModel) ValidatePrice() error {
-	pattern := "^[1-9](?:[0-9]+)?$"
-
-	match, err := regexp.MatchString(pattern, o.Price)
-	if err != nil {
-		return err
-	}
-
-	if match {
-		return nil
-	}
-
-	return errors.New("invalid order price")
 }
 
 func (o OrderModel) ValidateStatus() error {
