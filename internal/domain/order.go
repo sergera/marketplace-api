@@ -36,7 +36,7 @@ func (s Status) String() string {
 type OrderModel struct {
 	Id     string    `json:"id"`
 	Price  uint64    `json:"price"`
-	Status string    `json:"Status"`
+	Status string    `json:"status"`
 	Date   time.Time `json:"date"`
 }
 
