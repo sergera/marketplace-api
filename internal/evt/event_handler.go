@@ -6,20 +6,15 @@ import (
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"github.com/sergera/marketplace-api/internal/conf"
+	"github.com/sergera/marketplace-api/internal/domain"
 )
 
-type topic uint8
-
-const (
-	Unconfirmed topic = iota
-	InProgress
-	Ready
-)
-
-var Topics map[topic]string = map[topic]string{
-	Unconfirmed: "orders__unconfirmed",
-	InProgress:  "orders__in_progress",
-	Ready:       "orders__ready",
+var Topics map[domain.Status]string = map[domain.Status]string{
+	domain.Unconfirmed: "orders__unconfirmed",
+	domain.InProgress:  "orders__in_progress",
+	domain.Ready:       "orders__ready",
+	domain.InTransit:   "orders__in_transit",
+	domain.Delivered:   "orders__delivered",
 }
 
 type EventHandler struct {

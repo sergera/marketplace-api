@@ -54,7 +54,7 @@ func (o *OrderAPI) CreateOrder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	o.eventHandler.Produce(evt.Topics[evt.Unconfirmed], "", orderInBytes)
+	o.eventHandler.Produce(evt.Topics[domain.Unconfirmed], "", orderInBytes)
 
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
