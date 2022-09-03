@@ -17,6 +17,8 @@ import (
 var once sync.Once
 var instance *OrderNotifier
 
+var mu sync.Mutex
+
 type OrderNotifier struct {
 	queue     []domain.OrderModel
 	wsOptions websocket.AcceptOptions
@@ -60,16 +62,19 @@ func (n *OrderNotifier) PushOrders(w http.ResponseWriter, r *http.Request) {
 			return
 		case <-t.C:
 			if len(n.queue) > 0 {
-				first, rest := n.queue[0], n.queue[1:]
-				if err := wsjson.Write(ctx, c, first); err != nil {
+				mu.Lock()
+				if err := wsjson.Write(ctx, c, n.queue); err != nil {
 					log.Println("error sending websocket message: ", err.Error())
 				}
-				n.queue = rest
+				n.queue = []domain.OrderModel{}
+				mu.Unlock()
 			}
 		}
 	}
 }
 
 func (n *OrderNotifier) AppendOrder(m domain.OrderModel) {
+	mu.Lock()
 	n.queue = append(n.queue, m)
+	mu.Unlock()
 }
