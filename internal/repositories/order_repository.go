@@ -2,7 +2,6 @@ package repositories
 
 import (
 	"database/sql"
-	"strconv"
 
 	"github.com/sergera/marketplace-api/internal/domain"
 )
@@ -46,14 +45,10 @@ func (o *OrderRepository) UpdateOrder(m domain.OrderModel) error {
 }
 
 func (o *OrderRepository) GetOrderRange(m domain.OrderRangeModel) ([]domain.OrderModel, error) {
-	tx, err := o.conn.Session.Begin()
-	if err != nil {
-		return nil, err
-	}
-
 	var rows *sql.Rows
+	var err error
 	if m.OldestFirst {
-		rows, err = tx.Query(
+		rows, err = o.conn.Session.Query(
 			`
 			SELECT id, price, status, date_created
 			FROM orders
@@ -67,44 +62,22 @@ func (o *OrderRepository) GetOrderRange(m domain.OrderRangeModel) ([]domain.Orde
 		}
 		defer rows.Close()
 	} else {
-		var maxIdString string
-		tx.QueryRow(
+		rows, err = o.conn.Session.Query(
 			`
-			SELECT id
-			FROM orders
-			ORDER BY id DESC
-			LIMIT 1
-			`,
-		).Scan(&maxIdString)
+			WITH last_order AS (
+				SELECT id
+				FROM orders
+				ORDER BY id DESC
+				LIMIT 1
+			)
 
-		if maxIdString == "" {
-			var emptyOrderSlice []domain.OrderModel
-			return emptyOrderSlice, nil
-		}
-
-		maxId, err := strconv.ParseInt(maxIdString, 10, 64)
-		if err != nil {
-			return nil, err
-		}
-
-		start, err := strconv.ParseInt(m.Start, 10, 64)
-		if err != nil {
-			return nil, err
-		}
-
-		end, err := strconv.ParseInt(m.End, 10, 64)
-		if err != nil {
-			return nil, err
-		}
-
-		rows, err = tx.Query(
-			`
 			SELECT id, price, status, date_created
 			FROM orders
-			WHERE id >= $1 AND id <= $2
+			WHERE id <= ((SELECT id from last_order) - ($1 - 1))
+			AND id >= ((SELECT id from last_order) - ($2 - 1))
 			ORDER BY id DESC
 			`,
-			maxId-(end-1), maxId-(start-1),
+			m.Start, m.End,
 		)
 		if err != nil {
 			return nil, err
@@ -123,10 +96,6 @@ func (o *OrderRepository) GetOrderRange(m domain.OrderRangeModel) ([]domain.Orde
 	}
 
 	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-
-	if err := tx.Commit(); err != nil {
 		return nil, err
 	}
 
