@@ -35,7 +35,7 @@ func (conn *DBConnection) Open() {
 	if err != nil {
 		log.Panic(err)
 	}
-
+	session.SetMaxOpenConns(100)
 	conn.Session = session
 }
 
