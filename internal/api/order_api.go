@@ -14,7 +14,6 @@ import (
 )
 
 type OrderAPI struct {
-	conn         *repositories.DBConnection
 	orderRepo    *repositories.OrderRepository
 	eventHandler *evt.EventHandler
 	notifier     *notifier.OrderNotifier
@@ -22,13 +21,12 @@ type OrderAPI struct {
 
 func NewOrderAPI() *OrderAPI {
 	conf := conf.GetConf()
-	/* TODO: resolve database session lifecycle */
 	conn := repositories.NewDBConnection(conf.DBHost, conf.DBPort, conf.DBName, conf.DBUser, conf.DBPassword, false)
 	conn.Open()
 	orderRepo := repositories.NewOrderRepository(conn)
 	evtHandler := evt.NewEventHandler()
 	orderNotifier := notifier.GetOrderNotifier()
-	return &OrderAPI{conn, orderRepo, evtHandler, orderNotifier}
+	return &OrderAPI{orderRepo, evtHandler, orderNotifier}
 }
 
 func (o *OrderAPI) CreateOrder(w http.ResponseWriter, r *http.Request) {
