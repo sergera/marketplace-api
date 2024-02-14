@@ -56,7 +56,7 @@ func (o *OrderAPI) CreateOrder(w http.ResponseWriter, r *http.Request) {
 	}
 
 	o.eventHandler.Produce(evt.Topics[domain.Unconfirmed], "", orderInBytes)
-	o.notifier.AppendOrder(m)
+	o.notifier.Publish(m)
 
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
@@ -81,7 +81,7 @@ func (o *OrderAPI) UpdateOrder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	o.notifier.AppendOrder(m)
+	o.notifier.Publish(m)
 
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")

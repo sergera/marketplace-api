@@ -25,7 +25,7 @@ func main() {
 	mux.HandleFunc("/update-order", orderAPI.UpdateOrder)
 
 	orderNotifier := notifier.GetOrderNotifier()
-	mux.HandleFunc("/notify-orders", api.CorsHandler(orderNotifier.PushOrders))
+	mux.HandleFunc("/notify-orders", api.CorsHandler(orderNotifier.Subscribe))
 
 	srv := &http.Server{
 		Addr:    ":" + conf.Port,
